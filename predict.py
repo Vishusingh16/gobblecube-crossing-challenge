@@ -1,8 +1,18 @@
-"""Submission entry point - LightGBM intent + XGBoost trajectory.
+"""Submission entry point - Ensemble intent + XGBoost trajectory.
+
+Architecture:
+  Intent:    LightGBM + XGBoost ensemble -> averaged probability
+  Trajectory: 8 XGBoost regressors (cx, cy per horizon) predicting
+              residuals from constant-velocity baseline
 
 Contract (do NOT change the signature):
 
     predict(request: dict) -> dict
+
+Input:  one request dict with bbox_history, ego_speed_history, etc.
+Output: dict with 'intent' (float 0-1) and 4 future bboxes.
+
+See README.md for full architecture details.
 """
 
 from __future__ import annotations
