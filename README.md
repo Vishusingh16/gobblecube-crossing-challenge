@@ -291,6 +291,20 @@ Intent Pipeline:                          Trajectory Pipeline:
 - **Claude Code (opencode)** was used for architecture design, data exploration, debugging parquet parsing issues, and rapid iteration through multiple approaches
 - Where it fell short: the LSTM approach was AI-suggested but wrong for this dataset size. Domain judgment about when tabular beats deep learning was needed from the human.
 
+## Score Progression
+
+| Step | What Changed | Score | BCE | ADE | Why |
+|------|-------------|-------|-----|-----|-----|
+| 0 | Baseline (XGB intent + const-vel trajectory) | 0.8311 | 0.213 | 40.2 | Starting point |
+| 1 | LightGBM intent + LSTM trajectory | 0.9974 | 0.298 | 39.8 | Worse! Class weighting broke calibration |
+| 2 | Removed scale_pos_weight | 0.8978 | 0.248 | 39.8 | Fixed calibration, LSTM still weak |
+| 3 | Replaced LSTM with XGBoost trajectory | 0.7949 | 0.248 | 29.5 | 27% ADE improvement! GBT > LSTM |
+| 4 | Tuned XGBoost (600 trees, depth 6) | 0.7940 | 0.248 | 29.4 | More model capacity |
+| 5 | Added trajectory-specific features | 0.7909 | 0.248 | 29.1 | Acceleration, direction, interaction features |
+| 6 | Tuned LightGBM intent (regularization) | 0.7607 | 0.233 | 29.1 | Better calibration via regularization |
+| 7 | Expanded features (53 + 6 derived) | 0.7592 | 0.232 | 29.1 | Road proximity, deceleration features |
+| 8 | Ensemble intent (LightGBM + XGBoost) | **0.7463** | **0.226** | **29.1** | Averaging smooths errors |
+
 ## Scoring
 
 ```
