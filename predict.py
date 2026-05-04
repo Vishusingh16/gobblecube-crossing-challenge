@@ -155,7 +155,7 @@ def predict(request: dict) -> dict:
                         float(cv["x2"]), float(cv["y2"])]
 
     for k in HORIZON_KEYS:
-        out[k] = [float(v) if np.isfinite(v) else 0.0 for v in out[k]]
+        out[k] = [max(0.0, float(v)) if np.isfinite(v) else 0.0 for v in out[k]]
 
-    out["intent"] = intent_prob
+    out["intent"] = max(0.0, min(1.0, intent_prob))
     return out
