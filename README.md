@@ -4,6 +4,14 @@
 
 **Dev Score: 0.7463** (baseline: 0.8311) | Intent BCE: 0.2258 | Trajectory ADE: 29.1 px
 
+## Why I Chose The Crossing Challenge
+
+I picked the Crossing Challenge over the ETA Challenge for three reasons:
+
+1. **Real-world safety impact** - This is a life-safety problem for autonomous vehicles. Better pedestrian prediction = fewer collisions. ETA prediction for ride-hailing is a convenience/optimization problem.
+2. **Harder and more differentiated** - Trajectory prediction at multiple horizons with intent classification is a significantly harder ML problem. It demonstrates deeper ML capability than tabular regression.
+3. **More room for creative engineering** - The baseline uses constant-velocity trajectory (no acceleration modeling), which leaves a huge gap to close. Feature engineering and residual learning can make massive improvements here.
+
 ## Quick Start
 
 ```bash
