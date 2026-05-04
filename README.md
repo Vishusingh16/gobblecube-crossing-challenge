@@ -269,6 +269,28 @@ Intent Pipeline:                          Trajectory Pipeline:
 3. **Separate intent + trajectory models** - Each optimized independently for its task
 4. **Ensemble intent** - Averaging two GBT models improves calibration by smoothing errors
 
+## What I Tried That Didn't Work
+
+1. **LSTM trajectory model** - Built a bidirectional LSTM with attention pooling (~389K parameters), trained for 60 epochs on CPU. Result: ADE 39.2px vs constant-velocity 39.6px. Barely any improvement because the dataset (29K samples) is too small for deep learning to outperform well-engineered tabular features with gradient boosted trees. The LSTM was memorizing noise instead of learning real motion patterns.
+
+2. **Class weighting for intent (scale_pos_weight=11.6)** - Setting the class weight to the inverse of the 11.6:1 class ratio made the model over-predict positives. BCE jumped from 0.24 to 0.30 (worse than baseline). Log-loss penalizes overconfident wrong predictions heavily. The fix was removing class weighting entirely and relying on regularization instead.
+
+3. **Trajectory ensemble (XGBoost + LightGBM)** - Averaging predictions from both models only improved ADE by ~0.3px but doubled inference time from ~60ms to ~120ms per prediction. Both models learned nearly identical corrections, so averaging provided almost no benefit. Low-diversity ensembles don't help.
+
+4. **Raw position features for trajectory** - Initially tried predicting absolute bbox coordinates directly. Model struggled because the output range is huge (0-1920 pixels). Switching to residual learning (predict deltas from constant-velocity baseline) dramatically improved convergence and final score.
+
+## Next Experiments (If I Kept Going)
+
+1. **Platt scaling for intent calibration** - Post-hoc calibration using the dev set could squeeze the last BCE points by mapping raw model outputs to better-calibrated probabilities.
+2. **Multi-output trajectory regressor** - Train a single model predicting all 8 values (4 horizons x cx/cy) jointly instead of 8 independent models, so it can learn correlations between horizons (e.g., if +0.5s is wrong in one direction, +1.0s is probably wrong in the same direction).
+3. **Road-edge distance features** - Add features encoding how far the pedestrian is from the bottom of the frame (road edge). Pedestrians closer to the road edge have different crossing patterns.
+4. **Data augmentation for LSTM** - Random rotation, translation, and scaling of bbox sequences could 10x the effective dataset size and potentially make deep learning viable.
+
+## AI Tooling Used
+
+- **Claude Code (opencode)** was used for architecture design, data exploration, debugging parquet parsing issues, and rapid iteration through multiple approaches
+- Where it fell short: the LSTM approach was AI-suggested but wrong for this dataset size. Domain judgment about when tabular beats deep learning was needed from the human.
+
 ## Scoring
 
 ```
