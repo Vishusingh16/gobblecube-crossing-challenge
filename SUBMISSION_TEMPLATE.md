@@ -6,6 +6,12 @@ Dev composite score: **0.7463** (intent_term 0.908, traj_term 0.585; BCE 0.2258,
 
 Baseline was 0.8311 on Dev (XGBoost intent + constant-velocity trajectory).
 
+**10.2% improvement over baseline**, driven primarily by 27% trajectory ADE reduction.
+
+## Why I Chose the Crossing Challenge
+
+I chose the Crossing Challenge over the ETA Challenge because it is a **life-safety problem** for autonomous vehicles. Better pedestrian prediction directly reduces collision risk, which matters more than ride-hailing ETA optimization. The crossing challenge also requires solving two fundamentally different ML problems (classification + regression) in one pipeline, which demonstrates broader capability. Finally, the baseline's constant-velocity trajectory leaves a huge gap to close through feature engineering and residual learning.
+
 ## Approach
 
 I built a two-model pipeline:
